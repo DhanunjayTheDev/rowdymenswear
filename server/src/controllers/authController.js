@@ -8,10 +8,15 @@ const createToken = (userId) => {
 };
 
 const setTokenCookie = (res, token) => {
+  const isProd = process.env.NODE_ENV === 'production';
   res.cookie('token', token, {
     httpOnly: true,
-    secure: process.env.NODE_ENV === 'production',
-    sameSite: 'lax',
+    secure: isProd,
+    // Client/admin are served from a different origin than this API in production
+    // (e.g. Vercel vs onrender.com), so the cookie needs SameSite=None to be sent
+    // on cross-site requests. That requires Secure, which is only true in prod —
+    // locally everything still runs same-origin through the Vite proxy.
+    sameSite: isProd ? 'none' : 'lax',
     maxAge: 7 * 24 * 60 * 60 * 1000,
   });
 };
