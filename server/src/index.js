@@ -26,8 +26,15 @@ connectDB();
 
 app.use(morgan('dev'));
 
+const allowedOrigins = [process.env.CLIENT_URL, process.env.ADMIN_URL]
+  .filter(Boolean)
+  .map((url) => url.replace(/\/$/, ''));
+
 app.use(cors({
-  origin: [process.env.CLIENT_URL, process.env.ADMIN_URL].filter(Boolean),
+  origin: (origin, callback) => {
+    if (!origin || allowedOrigins.includes(origin)) return callback(null, true);
+    callback(new Error('Not allowed by CORS'));
+  },
   credentials: true,
 }));
 app.use(cookieParser());

@@ -2,7 +2,9 @@ const { Server } = require('socket.io');
 
 let io = null;
 
-const allowedOrigins = [process.env.CLIENT_URL, process.env.ADMIN_URL].filter(Boolean);
+const allowedOrigins = [process.env.CLIENT_URL, process.env.ADMIN_URL]
+  .filter(Boolean)
+  .map((url) => url.replace(/\/$/, ''));
 
 function initSocket(httpServer) {
   io = new Server(httpServer, {
